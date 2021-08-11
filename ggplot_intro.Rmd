@@ -13,6 +13,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(spData)
 library(sf)
 library(tidyverse)
+library(ggthemes)
+library(ggspatial)
 ```
 
 ## Loading data
@@ -50,15 +52,117 @@ homes <- st_as_sf(house)
 ```
 
 
-## Using ggplot
+# Scatter plots
 
 The `ggplot` package is part of `tidyverse`, which was developed by Hadley Wickham. It offers a powerful set of tools for visualizing data, using an approach Wickham refers to as "a layered grammar of graphics," which lets you create graphics using layers of commands.
 
-For the first "layer," you'll call the ggplot() function, which sets up the the plot. Then you can add layers to represent
+## Simple scatter plot
+
+For the first "layer," you'll call the ggplot() function, which sets up the the plot and indicates that we're working with the homes dataset we've loaded. Then you can add a layer to represent the data using `geom_point()`. You'll need to specify which variable you'll represent on the x-axis and which variable you'll represent on the y-axis. Let's make a quick scatterplot showing the year the home was built on the x-axis and the price of the home on the y-axis.
 
 ```{r}
-ggplot() +
-  geom_point(data = homes, aes(x = yrbuilt, y = price))
+ggplot(homes) +
+  geom_point(aes(x = yrbuilt, y = price))
 
 ```
-## Map
+
+In your own RStudio session, experiment with plotting other pairs of variables.
+
+## Additional variables
+
+I can represent additional variables with color and size. For example, I might have different colors represent different types of buildings (the `stories` variable).
+
+```{r}
+ggplot(homes) +
+  geom_point(aes(x = yrbuilt, y = price, color = stories))
+
+```
+
+And I might use the sizes of the points to represent each home's square footate (the `TLA` variable).
+
+```{r}
+ggplot(homes) +
+  geom_point(aes(x = yrbuilt, y = price, color = stories, size = TLA))
+```
+
+It's sort of hard to see what's going on with all those dots on top of each other, so you might want to make them all a little bit transparent using the `alpha` argument. 
+
+*Note:* Characteristics that represent variables should go inside the `aes()` function, and characteristics you want to apply to all variables should go outside the `aes()` function.
+
+
+```{r}
+ggplot(homes) +
+  geom_point(aes(x = yrbuilt, 
+                 y = price, 
+                 color = stories, 
+                 size = TLA),
+             alpha = 0.25)
+```
+
+In your own RStudio session, experiment with representing two or more of these variables in a variety of different ways. For if you want to go way beyond simple scatterplots, feel free to peruse the ggplot cheat sheet for inspiration.
+
+# Themes
+
+You might also apply a theme to your scatterplot if you don't like the default appearance. Here is the same scatterplot using a more minimalist theme.
+
+```{r}
+ggplot(homes) +
+  geom_point(aes(x = yrbuilt, 
+                 y = price, 
+                 color = stories, 
+                 size = TLA),
+             alpha = 0.25) +
+  theme_bw()
+```
+
+And here it is using a theme inspired by plots that appear in the Wall Street Journal.
+
+```{r}
+ggplot(homes) +
+  geom_point(aes(x = yrbuilt, 
+                 y = price, 
+                 color = stories, 
+                 size = TLA),
+             alpha = 0.25) +
+  theme_wsj()
+```
+
+Experiment with applying a few different themes to your scatterplot.
+
+# Map
+
+A scatter plot is useful for showing how two or more variables relate to one another, but we may also be interested in how they vary across space. This dataset includes spatial information, so we can plot it on a map using `geom_sf()`.
+
+Let's create a map showing how the price of a single-family home varies across space.
+
+```{r}
+ggplot(homes) +
+  geom_sf(aes(color = price), alpha = 0.5)
+```
+
+
+An appropriate theme for many maps is `theme_map`.
+
+```{r}
+ggplot(homes) +
+  geom_sf(aes(color = price), alpha = 0.5) + 
+  theme_map()
+```
+
+You might want to orient your viewer using a basemap. The `ggspatial` package has a few you can choose from. Here's the default.
+
+```{r}
+ggplot(homes) +
+  annotation_map_tile(zoomin = 0, progress = "none") +
+  geom_sf(aes(color = price), alpha = 0.5) + 
+  theme_map()
+```
+
+I also really like the black and white Stamen basemap.
+
+```{r}
+ggplot(homes) +
+  annotation_map_tile(zoomin = 0, progress = "none", type = "stamenbw") +
+  geom_sf(aes(color = price), alpha = 0.5) + 
+  theme_map()
+```
