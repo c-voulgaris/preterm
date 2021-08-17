@@ -1,25 +1,54 @@
 ---
-title: "Pre-term R Introduction"
+title: "Data Visualization in R"
 author: "Carole Voulgaris"
 date: "8/10/2021"
-output: html_document
+output: 
+  html_document:
+    theme: cosmo
+    toc: true
+    toc_depth: 3
+    toc_float: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
-library(spData)
-library(sf)
+# Introduction
+
+The purpose of this tutorial is to get you comfortable with editing code within the RStudio interface and to familiarize you with a few functions that are helpful for visualizing data. I'm assuming you've already installed R and RStudio on your computer, but that you have minimal prior experience with programming in any language.
+
+My goal isn't for you to leave this session knowing how to do everything your would like to do. My goal is for you to leave this session with questions that you're excited to figure out the answers to.
+
+Most of the functionality of R comes from packages. There are over 10,000 R packages available for a variety of uses, and some are quite specialized. Today, we will be using 
+
+* `tidyverse`: a collection of packages that's really useful for data visualization and data cleaning
+* `sf`: a set of tools for working with spatial data consistent with tidyverse methods
+* `spData`: a bunch of datasets for people to practice spatial data analysis
+* `ggthemes`: some nice themes you can use to quickly customize figures
+* `ggspatial`: some extra tools for creating attractive and useful maps).
+
+You will need to install these packages if you haven't already. Regardless of whether they're already installed, you'll need to load them using the `library()` function.
+
+```{r, message=FALSE}
 library(tidyverse)
+library(sf)
+library(spData)
 library(ggthemes)
 library(ggspatial)
 ```
 
-## Loading data
+# Loading data
 
-The `house` dataset is part of the spData package. It contains data on 25,357 single family homes sold in Lucas County, Ohio between 1993 and 1998, based on data from the county auditor (this data is taken from the James P. LeSage's [Spatial Econometrics Toolbox for Matlab](https://www.spatial-econometrics.com/){target="_blank"}. The dataset includes the following variables:
+The `house` dataset is included with the `spData` package. 
+
+I'm going to load the dataset and save it to a data frame called `homes`. The `st_as_sf()` function converts the data into the `sf` format.
+
+```{r}
+homes <- st_as_sf(house)
+```
+
+Once the data is loaded, you'll see it in your environment tab. It contains data on 25,357 single family homes sold in Lucas County, Ohio between 1993 and 1998, based on data from the county auditor (this data is taken from the James P. LeSage's [Spatial Econometrics Toolbox for Matlab](https://www.spatial-econometrics.com/){target="_blank"}. The dataset includes the following variables:
 
 * price: selling price
 * yrbuilt: year built
@@ -46,27 +75,24 @@ The `house` dataset is part of the spData package. It contains data on 25,357 si
 * syear: Year the home was sold
 * age: Age of the home in 1999, divided by 100
 
+**Exercise:** Click on the name of the dataset in your environment tab or type `View(homes)` in your console to view the data a spreadsheet format.
 
-```{r}
-homes <- st_as_sf(house)
-```
-
-
-# Scatter plots
+# Basic data visualization
 
 The `ggplot` package is part of `tidyverse`, which was developed by Hadley Wickham. It offers a powerful set of tools for visualizing data, using an approach Wickham refers to as "a layered grammar of graphics," which lets you create graphics using layers of commands.
 
 ## Simple scatter plot
 
-For the first "layer," you'll call the ggplot() function, which sets up the the plot and indicates that we're working with the homes dataset we've loaded. Then you can add a layer to represent the data using `geom_point()`. You'll need to specify which variable you'll represent on the x-axis and which variable you'll represent on the y-axis. Let's make a quick scatterplot showing the year the home was built on the x-axis and the price of the home on the y-axis.
+For the first "layer," you'll call the `ggplot()` function, which sets up the the plot and indicates that we're working with the `homes` dataset we've loaded. Then you can add a layer to represent the data using `geom_point()`. You'll need to specify which variable you'll represent on the x-axis and which variable you'll represent on the y-axis. 
+
+We'll make a quick scatterplot showing the year the home was built on the x-axis and the price of the home on the y-axis.
 
 ```{r}
 ggplot(homes) +
   geom_point(aes(x = yrbuilt, y = price))
-
 ```
 
-In your own RStudio session, experiment with plotting other pairs of variables.
+**Exercise:** In your own RStudio session, experiment with plotting other pairs of variables.
 
 ## Additional variables
 
@@ -78,7 +104,7 @@ ggplot(homes) +
 
 ```
 
-And I might use the sizes of the points to represent each home's square footate (the `TLA` variable).
+And I might use the sizes of the points to represent each home's square footage (the `TLA` variable).
 
 ```{r}
 ggplot(homes) +
@@ -87,7 +113,7 @@ ggplot(homes) +
 
 It's sort of hard to see what's going on with all those dots on top of each other, so you might want to make them all a little bit transparent using the `alpha` argument. 
 
-*Note:* Characteristics that represent variables should go inside the `aes()` function, and characteristics you want to apply to all variables should go outside the `aes()` function.
+**Note:** Characteristics that represent variables should go inside the `aes()` function, and characteristics you want to apply to all variables should go outside the `aes()` function.
 
 
 ```{r}
@@ -99,9 +125,11 @@ ggplot(homes) +
              alpha = 0.25)
 ```
 
-In your own RStudio session, experiment with representing two or more of these variables in a variety of different ways. For if you want to go way beyond simple scatterplots, feel free to peruse the ggplot cheat sheet for inspiration.
+**Exercise:** In your own RStudio session, experiment with representing two or more of these variables in a variety of different ways. 
 
-# Themes
+If you want to go way beyond simple scatterplots, feel free to peruse the [ggplot cheat sheet](https://c-voulgaris.github.io/preterm/data-visualization-2.1.pdf){target=_blank} for inspiration.
+
+## Themes
 
 You might also apply a theme to your scatterplot if you don't like the default appearance. Here is the same scatterplot using a more minimalist theme.
 
@@ -127,9 +155,11 @@ ggplot(homes) +
   theme_wsj()
 ```
 
-Experiment with applying a few different themes to your scatterplot.
+**Exercise:** Experiment with applying a few different themes to your scatterplot.
 
-# Map
+**Exercise:** Create an attractive scatterplot using the `house` dataset and share it with a small group of three or four classmates.
+
+# Displaying Data on a Map
 
 A scatter plot is useful for showing how two or more variables relate to one another, but we may also be interested in how they vary across space. This dataset includes spatial information, so we can plot it on a map using `geom_sf()`.
 
@@ -139,7 +169,6 @@ Let's create a map showing how the price of a single-family home varies across s
 ggplot(homes) +
   geom_sf(aes(color = price), alpha = 0.5)
 ```
-
 
 An appropriate theme for many maps is `theme_map`.
 
@@ -166,3 +195,13 @@ ggplot(homes) +
   geom_sf(aes(color = price), alpha = 0.5) + 
   theme_map()
 ```
+
+`annotation_map_tile()` is a function from the `ggspatial` package that brings in base map images from Open Street Maps. You can see a list of available base maps using `rosm::osm.types()`
+
+```{r}
+rosm::osm.types()
+```
+
+You can modify the appearance of the points on a map the same way you would for a scatterplot. 
+
+**Exersize:** Create an interesting map based on the `house` dataset and share it with a group of three or four classmates.
