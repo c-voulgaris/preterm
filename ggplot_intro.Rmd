@@ -20,13 +20,26 @@ The purpose of this tutorial is to get you comfortable with editing code within 
 
 My goal isn't for you to leave this session knowing how to do everything your would like to do. My goal is for you to leave this session with questions that you're excited to figure out the answers to.
 
+## The GIS interface
+
+Before we get started, let's take a little tour of the RStudio interface:
+
+* Locations of panes and menus
+* Writing code in the console
+* Writing code in a script
+* Writing code in an RMarkdown file
+
+Start a new RMarkdown file to follow along with the rest of this session.
+
+## Loading packages
+
 Most of the functionality of R comes from packages. There are over 10,000 R packages available for a variety of uses, and some are quite specialized. Today, we will be using 
 
 * `tidyverse`: a collection of packages that's really useful for data visualization and data cleaning
 * `sf`: a set of tools for working with spatial data consistent with tidyverse methods
 * `spData`: a bunch of datasets for people to practice spatial data analysis
 * `ggthemes`: some nice themes you can use to quickly customize figures
-* `ggspatial`: some extra tools for creating attractive and useful maps).
+* `ggspatial`: some extra tools for creating attractive and useful maps.
 
 You will need to install these packages if you haven't already. Regardless of whether they're already installed, you'll need to load them using the `library()` function.
 
